@@ -32,48 +32,58 @@ const replaceTemplate = require('./modules/replaceTemplate');
 /**
  * SERVER
  */
-const tempCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
-const tempOver = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
-const tempProd = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
+const tempCard = fs.readFileSync(
+  `${__dirname}/templates/template-card.html`,
+  'utf-8',
+);
+const tempOver = fs.readFileSync(
+  `${__dirname}/templates/template-overview.html`,
+  'utf-8',
+);
+const tempProd = fs.readFileSync(
+  `${__dirname}/templates/template-product.html`,
+  'utf-8',
+);
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const dataObj = JSON.parse(data);
-const productsSlug = dataObj.map(el => slugify(el.productName, {
-    replacement: '-',  // replace spaces with replacement character, defaults to `-`
+const productsSlug = dataObj.map((el) =>
+  slugify(el.productName, {
+    replacement: '-', // replace spaces with replacement character, defaults to `-`
     remove: undefined, // remove characters that match regex, defaults to `undefined`
-    lower: true,      // convert to lower case, defaults to `false`
-    trim: true        // trim leading and trailing replacement chars, defaults to `true`
-}));
+    lower: true, // convert to lower case, defaults to `false`
+    trim: true, // trim leading and trailing replacement chars, defaults to `true`
+  }),
+);
 console.log(productsSlug);
 
 const server = http.createServer((req, res) => {
-    const { pathname, query } = url.parse(req.url, true);
+  const { pathname, query } = url.parse(req.url, true);
 
-    if (pathname === '/' || pathname === '/overview') {
-        res.writeHead(200, { 'Content-type': 'text/html' })
+  if (pathname === '/' || pathname === '/overview') {
+    res.writeHead(200, { 'Content-type': 'text/html' });
 
-        const tempHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join();
-        const output = tempOver.replace(/{%PRODUCT_CARDS%}/, tempHtml);
+    const tempHtml = dataObj.map((el) => replaceTemplate(tempCard, el)).join();
+    const output = tempOver.replace(/{%PRODUCT_CARDS%}/, tempHtml);
 
-        res.end(output);
-    } else if (pathname === '/product') {
-        res.writeHead(200, { 'Content-type': 'text/html' })
+    res.end(output);
+  } else if (pathname === '/product') {
+    res.writeHead(200, { 'Content-type': 'text/html' });
 
-        const product = dataObj[query.id];
-        const output = replaceTemplate(tempProd, product)
+    const product = dataObj[query.id];
+    const output = replaceTemplate(tempProd, product);
 
-        res.end(output);
-    } else if (pathname === '/api') {
-        res.writeHead(200, { 'Content-type': 'application/json' })
-        res.end(data)
-    } else {
-        res.writeHead(404, {
-            'Content-type': 'text/html',
-            'my-own-header': 'hello-world'
-        })
-        res.end('<h1>Page not found!</h1>')
-    }
-
+    res.end(output);
+  } else if (pathname === '/api') {
+    res.writeHead(200, { 'Content-type': 'application/json' });
+    res.end(data);
+  } else {
+    res.writeHead(404, {
+      'Content-type': 'text/html',
+      'my-own-header': 'hello-world',
+    });
+    res.end('<h1>Page not found!</h1>');
+  }
 });
 server.listen('8000', '127.0.0.1', () => {
-    console.log('Server started!')
+  console.log('Server started!');
 });
