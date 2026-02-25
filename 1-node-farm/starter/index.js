@@ -1,6 +1,7 @@
 const fs = require('fs');
 const http = require('http');
 const url = require('url');
+const slugify = require('slugify');
 const replaceTemplate = require('./modules/replaceTemplate');
 
 /**
@@ -36,6 +37,13 @@ const tempOver = fs.readFileSync(`${__dirname}/templates/template-overview.html`
 const tempProd = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const dataObj = JSON.parse(data);
+const productsSlug = dataObj.map(el => slugify(el.productName, {
+    replacement: '-',  // replace spaces with replacement character, defaults to `-`
+    remove: undefined, // remove characters that match regex, defaults to `undefined`
+    lower: true,      // convert to lower case, defaults to `false`
+    trim: true        // trim leading and trailing replacement chars, defaults to `true`
+}));
+console.log(productsSlug);
 
 const server = http.createServer((req, res) => {
     const { pathname, query } = url.parse(req.url, true);
