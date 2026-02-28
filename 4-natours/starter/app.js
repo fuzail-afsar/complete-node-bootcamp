@@ -66,12 +66,18 @@ app.patch('/api/v1/tours/:id', (req, res) => {
   }
 
   const updatedTour = Object.assign(tour, req.body);
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour: updatedTour,
+  fs.writeFile(
+    `${__dirname}/dev-data/data/tours-simple.json`,
+    JSON.stringify(tours),
+    () => {
+      res.status(200).json({
+        status: 'success',
+        data: {
+          tour: updatedTour,
+        },
+      });
     },
-  });
+  );
 });
 
 const port = 3000;
