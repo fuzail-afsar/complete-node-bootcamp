@@ -40,7 +40,7 @@ exports.getAllTours = (req, res) => {
 };
 exports.createTour = (req, res) => {
   const newTourId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newTourId }, req.body);
+  const newTour = { id: newTourId, ...req.body };
   tours.push(newTour);
 
   fs.writeFile(
