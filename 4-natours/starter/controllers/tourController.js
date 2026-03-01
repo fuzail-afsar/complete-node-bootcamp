@@ -4,6 +4,19 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`),
 );
 
+exports.checkID = (req, res, next, val) => {
+  const index = tours.findIndex((el) => el.id === val * 1);
+
+  if (index === -1) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid id',
+    });
+  }
+  req.tourIndex = index;
+  next();
+};
+
 exports.getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -19,7 +32,7 @@ exports.createTour = (req, res) => {
   tours.push(newTour);
 
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
+    `${__dirname}/../dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
     () => {
       res.status(201).json({
@@ -32,15 +45,7 @@ exports.createTour = (req, res) => {
   );
 };
 exports.getTour = (req, res) => {
-  const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
-
-  if (!tour) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid id',
-    });
-  }
+  const tour = tours[req.tourIndex];
 
   res.status(200).json({
     status: 'success',
@@ -50,19 +55,11 @@ exports.getTour = (req, res) => {
   });
 };
 exports.updateTour = (req, res) => {
-  const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
-
-  if (!tour) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid id',
-    });
-  }
-
+  const tour = tours[req.tourIndex];
   const updatedTour = Object.assign(tour, req.body);
+
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
+    `${__dirname}/../dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
     () => {
       res.status(200).json({
@@ -75,26 +72,15 @@ exports.updateTour = (req, res) => {
   );
 };
 exports.deleteTour = (req, res) => {
-  const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
+  tours.splice(req.tourIndex, 1);
 
-  if (!tour) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid id',
-    });
-  }
-
-  const updatedTour = Object.assign(tour, req.body);
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
+    `${__dirname}/../dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
     () => {
-      res.status(200).json({
+      res.status(204).json({
         status: 'success',
-        data: {
-          tour: updatedTour,
-        },
+        data: null,
       });
     },
   );
